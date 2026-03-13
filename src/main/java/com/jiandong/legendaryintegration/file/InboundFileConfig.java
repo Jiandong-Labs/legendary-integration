@@ -13,26 +13,26 @@ import org.springframework.integration.dsl.Pollers;
 import org.springframework.integration.file.dsl.Files;
 
 @Configuration
-public class FileIntegrationFlow {
+public class InboundFileConfig {
 
-	private static final Logger logger = LoggerFactory.getLogger(FileIntegrationFlow.class);
+	private static final Logger logger = LoggerFactory.getLogger(InboundFileConfig.class);
 
 	private static final String INBOUND_PATH = "/Users/majiandong/Downloads";
 
 	@Bean
-	public IntegrationFlow fileReadingFlow() {
+	public IntegrationFlow inboundFileFlow() {
 		return IntegrationFlow
 				.from(Files.inboundAdapter(new File(INBOUND_PATH))
 								.patternFilter("*.txt")
-								.ignoreHidden(true) // IgnoreHiddenFileListFilter
-								.preventDuplicates(true) // AcceptOnceFileListFilter
+								.ignoreHidden(true)
+								.preventDuplicates(true)
 						, e -> e.poller(Pollers.fixedDelay(10 * 1000)))
 				.channel("processFileChannel")
 				.get();
 	}
 
 	@Bean
-	public IntegrationFlow fileConsumingFlow() {
+	public IntegrationFlow inboundFileProcessFlow() {
 		return IntegrationFlow.from("processFileChannel")
 				.handle((GenericHandler<File>) (file, headers) -> {
 					logger.info("Received filename {}, filePath {}", file.getName(), file.getAbsolutePath());
