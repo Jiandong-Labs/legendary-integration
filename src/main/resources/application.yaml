@@ -1,3 +1,15 @@
 spring:
   application:
     name: legendary-integration
+  mail:
+    host: smtp.qq.com
+    port: 465
+    username: mjd507@qq.com
+    password: ${mail_authorization_code}
+    protocol: smtp
+    ssl:
+      enabled: true
+    properties:
+      "[mail.smtp.connectiontimeout]": 5000
+      "[mail.smtp.timeout]": 3000
+      "[mail.smtp.writetimeout]": 5000
