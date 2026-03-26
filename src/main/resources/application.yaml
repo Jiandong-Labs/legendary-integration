@@ -21,3 +21,10 @@ sftp:
   password: ${sftp_password}
   remote_dir: /Users/majiandong/Downloads/SFTP_Remote
   local_dir: /Users/majiandong/Downloads/SFTP_Local
+
+mail:
+  host: imap.qq.com
+  port: 993
+  username: mjd507@qq.com
+  password: ${mail_authorization_code}
+  protocol: imaps
