@@ -13,3 +13,11 @@ spring:
       "[mail.smtp.connectiontimeout]": 5000
       "[mail.smtp.timeout]": 3000
       "[mail.smtp.writetimeout]": 5000
+
+sftp:
+  host: localhost
+  port: 22
+  user: majiandong
+  password: ${sftp_password}
+  remote_dir: /Users/majiandong/Downloads/SFTP_Remote
+  local_dir: /Users/majiandong/Downloads/SFTP_Local

@@ -6,6 +6,8 @@ import org.apache.sshd.sftp.client.SftpClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -26,23 +28,26 @@ import org.springframework.integration.sftp.session.DefaultSftpSessionFactory;
 
 @Profile("sftp")
 @Configuration
+@EnableConfigurationProperties(SftpInboundFileConfig.SftpProperties.class)
 public class SftpInboundFileConfig {
 
 	private static final Logger log = LoggerFactory.getLogger(SftpInboundFileConfig.class);
 
-	private static final String LOCAL_PATH = "/Users/majiandong/Downloads/SFTP_Local";
-
-	private static final String REMOTE_PATH = "/Users/majiandong/Downloads/SFTP_Remote";
-
 	private static final String META_DATA = "/Users/majiandong/Downloads/Meta_Data";
 
+	@ConfigurationProperties("sftp")
+	public record SftpProperties(String host, Integer port, String user, String password,
+								 String remoteDir, String localDir) {
+
+	}
+
 	@Bean
-	public SessionFactory<SftpClient.DirEntry> sftpSessionFactory() {
+	public SessionFactory<SftpClient.DirEntry> sftpSessionFactory(SftpProperties sftpProperties) {
 		DefaultSftpSessionFactory factory = new DefaultSftpSessionFactory(true);
-		factory.setHost("localhost");
-		factory.setPort(22);
-		factory.setUser("majiandong");
-		factory.setPassword("2026");
+		factory.setHost(sftpProperties.host());
+		factory.setPort(sftpProperties.port());
+		factory.setUser(sftpProperties.user());
+		factory.setPassword(sftpProperties.password());
 		factory.setAllowUnknownKeys(true);
 		return new CachingSessionFactory<>(factory);
 	}
@@ -76,28 +81,32 @@ public class SftpInboundFileConfig {
 
 	private CompositeFileListFilter<SftpClient.DirEntry> remoteSftpFileFilter() {
 		var compositeFileListFilter = new CompositeFileListFilter<SftpClient.DirEntry>();
+		var sftpFileNameStore = new SftpPersistentAcceptOnceFileListFilter(remoteFileNameStore(), "sftpFileStore");
+		sftpFileNameStore.setFlushOnUpdate(true);
 		compositeFileListFilter.addFilters(
 				new SftpRegexPatternFileListFilter("^.*\\.txt$"),
-				new SftpPersistentAcceptOnceFileListFilter(remoteFileNameStore(), "sftpFileStore"));
+				sftpFileNameStore);
 		return compositeFileListFilter;
 	}
 
 	private CompositeFileListFilter<File> localFileFilter() {
 		var fileListFilter = new CompositeFileListFilter<File>();
+		var localFileNameStore = new FileSystemPersistentAcceptOnceFileListFilter(localFileNameStore(), "localFileStore");
+		localFileNameStore.setFlushOnUpdate(true);
 		fileListFilter
 				.addFilter(new IgnoreHiddenFileListFilter())
-				.addFilter(new FileSystemPersistentAcceptOnceFileListFilter(localFileNameStore(), "localFileStore"));
+				.addFilter(localFileNameStore);
 		return fileListFilter;
 	}
 
 	@Bean
-	public IntegrationFlow sftpInboundFileFlow() {
+	public IntegrationFlow sftpInboundFileFlow(SftpProperties sftpProperties) {
 		return IntegrationFlow
-				.from(Sftp.inboundAdapter(sftpSessionFactory())
+				.from(Sftp.inboundAdapter(sftpSessionFactory(sftpProperties))
 						.preserveTimestamp(true)
-						.remoteDirectory(REMOTE_PATH)
+						.remoteDirectory(sftpProperties.remoteDir)
 						.filter(remoteSftpFileFilter()) // remote filter: Prevents re-downloading from SFTP
-						.localDirectory(new File(LOCAL_PATH))
+						.localDirectory(new File(sftpProperties.localDir))
 						.localFilter(localFileFilter())
 						.remoteFileMetadataStore(remoteFileMetaStore()) // remote file metadata retrieval, not for filtering.
 						.maxFetchSize(10)
