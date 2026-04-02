@@ -15,16 +15,19 @@ java {
 }
 
 repositories {
+	mavenLocal()
 	mavenCentral()
 }
 
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-webmvc'
 	implementation 'org.springframework.boot:spring-boot-starter-integration'
-	implementation "org.springframework.integration:spring-integration-file"
-	implementation "org.springframework.integration:spring-integration-sftp"
-	implementation 'org.springframework.boot:spring-boot-starter-mail'
-	implementation "org.springframework.integration:spring-integration-mail"
+	implementation "org.springframework.integration:spring-integration-file" // file
+	implementation "org.springframework.integration:spring-integration-sftp" // sftp
+	implementation 'org.springframework.boot:spring-boot-starter-mail'		 // boot-mail
+	implementation "org.springframework.integration:spring-integration-mail" // mail
+	implementation 'org.springframework.boot:spring-boot-starter-data-redis' // boot-redis
+	implementation "org.springframework.integration:spring-integration-redis"// redis
 	testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
 	testImplementation 'org.springframework.integration:spring-integration-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
