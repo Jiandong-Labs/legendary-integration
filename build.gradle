@@ -29,6 +29,7 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis' // boot-redis
 	implementation "org.springframework.integration:spring-integration-redis"// redis
 	implementation "org.springframework.integration:spring-integration-http" // http
+	implementation "org.springframework.integration:spring-integration-event" // event
 	testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
 	testImplementation 'org.springframework.integration:spring-integration-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
