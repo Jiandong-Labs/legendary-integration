@@ -18,6 +18,8 @@ spring:
       host: localhost
       port: 6379
       client-type: lettuce
+  activemq:
+    broker-url: vm://localhost?broker.persistent=false
 
 sftp:
   host: localhost
