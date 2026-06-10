@@ -21,6 +21,7 @@ repositories {
 
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-webmvc'
+	implementation("org.springframework.boot:spring-boot-starter-actuator")
 	implementation 'org.springframework.boot:spring-boot-starter-integration'
 	implementation "org.springframework.integration:spring-integration-file" // file
 	implementation "org.springframework.integration:spring-integration-sftp" // sftp
@@ -34,6 +35,7 @@ dependencies {
 	implementation 'org.apache.activemq:activemq-broker'                      // activemq-broker
 	implementation "org.springframework.integration:spring-integration-jms"   // jms
 	testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
+	testImplementation("org.springframework.boot:spring-boot-starter-actuator-test")
 	testImplementation 'org.springframework.integration:spring-integration-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
