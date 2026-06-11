@@ -25,6 +25,8 @@ spring:
       client-type: lettuce
   activemq:
     broker-url: vm://localhost?broker.persistent=false
+  integration:
+    annotations.enable: false
 
 sftp:
   host: localhost
