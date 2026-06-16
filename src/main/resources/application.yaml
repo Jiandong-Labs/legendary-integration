@@ -3,6 +3,10 @@ management:
     web:
       exposure:
         include: '*'
+  health:
+    defaults:
+      enabled: false
+
 spring:
   application:
     name: legendary-integration
