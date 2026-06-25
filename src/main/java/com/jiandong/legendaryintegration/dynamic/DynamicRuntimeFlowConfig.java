@@ -2,70 +2,66 @@ package com.jiandong.legendaryintegration.dynamic;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-import jakarta.annotation.PreDestroy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.springframework.context.ApplicationListener;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
 import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.context.event.EventListener;
+import org.springframework.integration.channel.QueueChannel;
 import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.dsl.Pollers;
 import org.springframework.integration.dsl.context.IntegrationFlowContext;
-import org.springframework.messaging.Message;
+import org.springframework.messaging.MessageHeaders;
 
-@Profile("dynamic-runtime-flow")
 @Configuration
-public class DynamicRuntimeFlowConfig implements ApplicationListener<ContextRefreshedEvent> {
+public class DynamicRuntimeFlowConfig {
 
 	private static final Logger log = LoggerFactory.getLogger(DynamicRuntimeFlowConfig.class);
 
 	private final IntegrationFlowContext integrationFlowContext;
 
-	private final AtomicInteger flow1Source = new AtomicInteger(0);
-
-	private final AtomicInteger flow2Source = new AtomicInteger(0);
-
-	private IntegrationFlowContext.IntegrationFlowRegistration flow1Registration;
-
-	private IntegrationFlowContext.IntegrationFlowRegistration flow2Registration;
-
 	public DynamicRuntimeFlowConfig(IntegrationFlowContext integrationFlowContext) {
 		this.integrationFlowContext = integrationFlowContext;
 	}
 
-	@Override
-	public void onApplicationEvent(ContextRefreshedEvent event) {
-		flow1Registration = integrationFlowContext.registration(IntegrationFlow
-						.fromSupplier(flow1Source::getAndIncrement, e -> e
+	@EventListener(ContextRefreshedEvent.class)
+	public void createDynamicFlows() {
+		integrationFlowContext.registration(IntegrationFlow
+						.fromSupplier(new AtomicInteger(0)::incrementAndGet, e -> e
 								.poller(Pollers.fixedDelay(10 * 1000)))
 						.enrichHeaders(headers -> headers.header("source", "source1"))
 						.handle(this::sharedHandler)
+						.channel("sharedOutputChannel")
 						.get()
 				)
 				.id("dynamicFlow1")
+				.autoStartup(false)
 				.register();
 
-		flow2Registration = integrationFlowContext.registration(IntegrationFlow
-						.fromSupplier(flow2Source::getAndIncrement, e -> e
+		integrationFlowContext.registration(IntegrationFlow
+						.fromSupplier(new AtomicInteger(0)::incrementAndGet, e -> e
 								.poller(Pollers.fixedDelay(10 * 1000)))
 						.enrichHeaders(headers -> headers.header("source", "source2"))
 						.handle(this::sharedHandler)
+						.channel("sharedOutputChannel")
 						.get()
 				)
 				.id("dynamicFlow2")
+				.autoStartup(false)
 				.register();
 	}
 
-	private void sharedHandler(Message<?> message) {
-		log.info("handle message: {} from source {}", message.getPayload(), message.getHeaders().get("source"));
+	private String sharedHandler(Integer payload, MessageHeaders headers) {
+		String source = (String) headers.get("source");
+		log.info("handle message: {} from source {}", payload, source);
+		return source + ":" + payload;
 	}
 
-	@PreDestroy
-	public void destroy() {
-		flow1Registration.destroy();
-		flow2Registration.destroy();
+	@Bean
+	public QueueChannel sharedOutputChannel() {
+		return new QueueChannel();
 	}
 
 }

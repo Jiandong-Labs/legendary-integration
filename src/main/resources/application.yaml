@@ -32,6 +32,10 @@ spring:
   integration:
     annotations.enable: false
 
+file:
+  writing-dir: ${java.io.tmpdir}/random-folder/
+  reading-dir: ${java.io.tmpdir}/random-folder/
+
 sftp:
   host: localhost
   port: 22
