@@ -15,7 +15,7 @@ spring:
     port: 465
     username: mjd507@qq.com
     password: ${mail_authorization_code}
-    protocol: smtp
+    protocol: smtps
     ssl:
       enabled: true
     properties:
