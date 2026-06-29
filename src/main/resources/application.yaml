@@ -39,10 +39,11 @@ file:
 sftp:
   host: localhost
   port: 22
-  user: majiandong
+  user: jiandong
   password: ${sftp_password}
-  remote_dir: /Users/majiandong/Downloads/SFTP_Remote
-  local_dir: /Users/majiandong/Downloads/SFTP_Local
+  meta_data_dir: ${java.io.tmpdir}/Meta_Data
+  remote_dir: ${java.io.tmpdir}/SFTP_Remote
+  local_dir: ${java.io.tmpdir}/SFTP_Local
 
 mail:
   host: imap.qq.com

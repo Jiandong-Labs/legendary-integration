@@ -5,10 +5,10 @@ import java.util.Properties;
 
 import com.icegreen.greenmail.util.GreenMail;
 import com.icegreen.greenmail.util.ServerSetupTest;
-import com.jiandong.legendaryintegration.mail.parser.MimeMessageParser;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
+import org.apache.commons.mail2.jakarta.util.MimeMessageParser;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;

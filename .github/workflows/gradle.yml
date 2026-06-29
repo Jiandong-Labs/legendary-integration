@@ -8,7 +8,7 @@ on:
 
 jobs:
   build:
-    uses: Jiandong-Labs/github-workflow/.github/workflows/gradle.yml@main
+    uses: Jiandong-Labs/github-workflow/.github/workflows/gradle.yml@v1.0.0
     with:
       run-jacoco-badge: true
     secrets:

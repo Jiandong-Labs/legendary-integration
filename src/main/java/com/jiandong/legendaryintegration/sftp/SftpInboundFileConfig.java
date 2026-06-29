@@ -11,6 +11,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+import org.springframework.integration.channel.QueueChannel;
 import org.springframework.integration.core.GenericHandler;
 import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.dsl.Pollers;
@@ -27,17 +28,15 @@ import org.springframework.integration.sftp.filters.SftpRegexPatternFileListFilt
 import org.springframework.integration.sftp.session.DefaultSftpSessionFactory;
 
 @Profile("sftp")
-@Configuration
+@Configuration(proxyBeanMethods = false)
 @EnableConfigurationProperties(SftpInboundFileConfig.SftpProperties.class)
 public class SftpInboundFileConfig {
 
 	private static final Logger log = LoggerFactory.getLogger(SftpInboundFileConfig.class);
 
-	private static final String META_DATA = "/Users/majiandong/Downloads/Meta_Data";
-
 	@ConfigurationProperties("sftp")
 	public record SftpProperties(String host, Integer port, String user, String password,
-								 String remoteDir, String localDir) {
+								 String metaDataDir, String remoteDir, String localDir) {
 
 	}
 
@@ -53,35 +52,23 @@ public class SftpInboundFileConfig {
 	}
 
 	@Bean
-	public ConcurrentMetadataStore remoteFileNameStore() {
+	public ConcurrentMetadataStore remoteFileMetaStore(SftpProperties sftpProperties) {
 		var metadataStore = new PropertiesPersistingMetadataStore();
-		metadataStore.setBaseDirectory(META_DATA);
-		metadataStore.setFileName("sftp_file.properties");
-		metadataStore.afterPropertiesSet();
-		return metadataStore;
-	}
-
-	@Bean
-	public ConcurrentMetadataStore remoteFileMetaStore() {
-		var metadataStore = new PropertiesPersistingMetadataStore();
-		metadataStore.setBaseDirectory(META_DATA);
+		metadataStore.setBaseDirectory(sftpProperties.metaDataDir);
 		metadataStore.setFileName("sftp_meta_data.properties");
 		metadataStore.afterPropertiesSet();
 		return metadataStore;
 	}
 
 	@Bean
-	public ConcurrentMetadataStore localFileNameStore() {
-		var metadataStore = new PropertiesPersistingMetadataStore();
-		metadataStore.setBaseDirectory(META_DATA);
-		metadataStore.setFileName("local_file.properties");
-		metadataStore.afterPropertiesSet();
-		return metadataStore;
-	}
+	public CompositeFileListFilter<SftpClient.DirEntry> remoteSftpFileFilter(SftpProperties sftpProperties) {
+		var remoteFileNameStore = new PropertiesPersistingMetadataStore();
+		remoteFileNameStore.setBaseDirectory(sftpProperties.metaDataDir);
+		remoteFileNameStore.setFileName("sftp_file.properties");
+		remoteFileNameStore.afterPropertiesSet();
 
-	private CompositeFileListFilter<SftpClient.DirEntry> remoteSftpFileFilter() {
 		var compositeFileListFilter = new CompositeFileListFilter<SftpClient.DirEntry>();
-		var sftpFileNameStore = new SftpPersistentAcceptOnceFileListFilter(remoteFileNameStore(), "sftpFileStore");
+		var sftpFileNameStore = new SftpPersistentAcceptOnceFileListFilter(remoteFileNameStore, "sftpFileStore");
 		sftpFileNameStore.setFlushOnUpdate(true);
 		compositeFileListFilter.addFilters(
 				new SftpRegexPatternFileListFilter("^.*\\.txt$"),
@@ -89,37 +76,51 @@ public class SftpInboundFileConfig {
 		return compositeFileListFilter;
 	}
 
-	private CompositeFileListFilter<File> localFileFilter() {
+	@Bean
+	public CompositeFileListFilter<File> localFileFilter(SftpProperties sftpProperties) {
+		var localFileNameStore = new PropertiesPersistingMetadataStore();
+		localFileNameStore.setBaseDirectory(sftpProperties.metaDataDir);
+		localFileNameStore.setFileName("local_file.properties");
+		localFileNameStore.afterPropertiesSet();
+
 		var fileListFilter = new CompositeFileListFilter<File>();
-		var localFileNameStore = new FileSystemPersistentAcceptOnceFileListFilter(localFileNameStore(), "localFileStore");
-		localFileNameStore.setFlushOnUpdate(true);
+		var localFileStore = new FileSystemPersistentAcceptOnceFileListFilter(localFileNameStore, "localFileStore");
+		localFileStore.setFlushOnUpdate(true);
 		fileListFilter
 				.addFilter(new IgnoreHiddenFileListFilter())
-				.addFilter(localFileNameStore);
+				.addFilter(localFileStore);
 		return fileListFilter;
 	}
 
 	@Bean
-	public IntegrationFlow sftpInboundFileFlow(SftpProperties sftpProperties) {
+	public IntegrationFlow sftpInboundFileFlow(SessionFactory<SftpClient.DirEntry> sftpSessionFactory,
+			SftpProperties sftpProperties, CompositeFileListFilter<SftpClient.DirEntry> remoteSftpFileFilter,
+			CompositeFileListFilter<File> localFileFilter, ConcurrentMetadataStore remoteFileMetaStore) {
 		return IntegrationFlow
-				.from(Sftp.inboundAdapter(sftpSessionFactory(sftpProperties))
+				.from(Sftp.inboundAdapter(sftpSessionFactory)
 						.preserveTimestamp(true)
 						.remoteDirectory(sftpProperties.remoteDir)
-						.filter(remoteSftpFileFilter()) // remote filter: Prevents re-downloading from SFTP
+						.filter(remoteSftpFileFilter) // remote filter: Prevents re-downloading from SFTP
 						.localDirectory(new File(sftpProperties.localDir))
-						.localFilter(localFileFilter())
-						.remoteFileMetadataStore(remoteFileMetaStore()) // remote file metadata retrieval, not for filtering.
+						.localFilter(localFileFilter)
+						.remoteFileMetadataStore(remoteFileMetaStore) // remote file metadata retrieval, not for filtering.
 						.maxFetchSize(10)
 						.autoCreateLocalDirectory(true), e -> e
 						.id("sftpInboundAdapter")
-						.autoStartup(true)
+						.autoStartup(false)
 						.poller(Pollers.fixedDelay(10 * 1000)))
 				.handle((GenericHandler<File>) (file, headers) -> {
 					log.info("Received filename {}, filePath {}", file.getName(), file.getAbsolutePath());
 					log.info("headers {}", headers);
-					return null;
+					return file;
 				})
+				.channel("sftpFileOutputChannel")
 				.get();
+	}
+
+	@Bean
+	QueueChannel sftpFileOutputChannel() {
+		return new QueueChannel();
 	}
 
 }

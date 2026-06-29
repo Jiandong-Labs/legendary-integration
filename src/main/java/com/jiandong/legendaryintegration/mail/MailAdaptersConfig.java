@@ -3,9 +3,9 @@ package com.jiandong.legendaryintegration.mail;
 import java.io.IOException;
 import java.util.Objects;
 
-import com.jiandong.legendaryintegration.mail.parser.MimeMessageParser;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
+import org.apache.commons.mail2.jakarta.util.MimeMessageParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

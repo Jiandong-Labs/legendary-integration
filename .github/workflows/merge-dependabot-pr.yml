@@ -6,4 +6,4 @@ on:
 
 jobs:
   auto-merge:
-    uses: Jiandong-Labs/github-workflow/.github/workflows/auto-merge.yml@main
+    uses: Jiandong-Labs/github-workflow/.github/workflows/auto-merge.yml@v1.0.0
