@@ -5,13 +5,10 @@ spring:
     username: abc@com
     password: abc
     protocol: smtp
+    ssl:
+      enabled: false
     properties:
       "[mail.debug]": false
-
-
-file:
-  writing-dir: ${java.io.tmpdir}/random-folder/
-  reading-dir: ${java.io.tmpdir}/random-folder/
 
 mail:
   host: localhost
@@ -19,3 +16,17 @@ mail:
   username: xyz@cn
   password: xyz
   protocol: imap
+
+file:
+  writing-dir: ${java.io.tmpdir}/random-folder/
+  reading-dir: ${java.io.tmpdir}/random-folder/
+
+sftp:
+  host: will-be-overrided
+  port: 1
+  user: will-be-overrided
+  password: will-be-overrided
+  dirs:
+    meta_data_dir: will-be-overrided
+    remote_dir: will-be-overrided
+    local_dir: will-be-overrided

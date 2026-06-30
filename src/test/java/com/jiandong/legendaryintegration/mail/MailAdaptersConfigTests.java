@@ -16,8 +16,8 @@ import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
+import org.springframework.boot.mail.autoconfigure.MailProperties;
 import org.springframework.boot.mail.autoconfigure.MailSenderAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.integration.channel.QueueChannel;
@@ -40,23 +40,25 @@ class MailAdaptersConfigTests {
 
 	GreenMail mailServer;
 
-	@Value("${spring.mail.username}")
-	private String senderName;
+	@Autowired
+	MailProperties senderMailProperties;
 
-	@Value("${spring.mail.password}")
-	private String senderPassword;
+	@Autowired
+	MailAdaptersConfig.ImapMailProperties receiverMailProperties;
 
-	@Value("${mail.username}")
-	private String receiverName;
+	private String sender;
 
-	@Value("${mail.password}")
-	private String receiverPassword;
+	private String receiver;
 
 	@BeforeEach
 	void setup() {
 		mailServer = new GreenMail(ServerSetupTest.SMTP_IMAP);
-		mailServer.setUser(senderName, senderPassword);
-		mailServer.setUser(receiverName, receiverPassword);
+
+		sender = senderMailProperties.getUsername();
+		receiver = receiverMailProperties.username();
+
+		mailServer.setUser(sender, senderMailProperties.getPassword());
+		mailServer.setUser(receiver, receiverMailProperties.password());
 		mailServer.start();
 	}
 
@@ -89,8 +91,8 @@ class MailAdaptersConfigTests {
 		// sending to receiver
 		mailSendingChannel.send(MessageBuilder
 				.withPayload("this is a test email message.")
-				.setHeader("from", senderName)
-				.setHeader("to", new String[] {receiverName})
+				.setHeader("from", sender)
+				.setHeader("to", new String[] {receiver})
 				.setHeader("subject", "hello xyz")
 				.build());
 
@@ -99,8 +101,8 @@ class MailAdaptersConfigTests {
 		MimeMessage[] mimeMessages = mailServer.getReceivedMessagesForDomain("cn");
 		assertThat(mimeMessages.length > 0).isTrue();
 		MimeMessage message = mimeMessages[0];
-		assertThat(message.getFrom()).containsOnly(new InternetAddress(senderName));
-		assertThat(message.getRecipients(MimeMessage.RecipientType.TO)).containsOnly(new InternetAddress(receiverName));
+		assertThat(message.getFrom()).containsOnly(new InternetAddress(sender));
+		assertThat(message.getRecipients(MimeMessage.RecipientType.TO)).containsOnly(new InternetAddress(receiver));
 		assertThat(message.getSubject()).isEqualTo("hello xyz");
 		assertThat(message.getContent()).asString().isEqualTo("this is a test email message.");
 
@@ -112,8 +114,8 @@ class MailAdaptersConfigTests {
 				.extracting(Message::getPayload)
 				.isInstanceOfSatisfying(MimeMessageParser.class, mimeMessageParser -> {
 					try {
-						assertThat(mimeMessageParser.getFrom()).isEqualTo(senderName);
-						assertThat(mimeMessageParser.getTo()).containsOnly(new InternetAddress(receiverName));
+						assertThat(mimeMessageParser.getFrom()).isEqualTo(sender);
+						assertThat(mimeMessageParser.getTo()).containsOnly(new InternetAddress(receiver));
 						assertThat(mimeMessageParser.getSubject()).isEqualTo("hello xyz");
 						assertThat(mimeMessageParser.getPlainContent()).isEqualTo("this is a test email message.");
 					}

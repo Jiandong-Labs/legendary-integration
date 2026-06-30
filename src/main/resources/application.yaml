@@ -32,6 +32,13 @@ spring:
   integration:
     annotations.enable: false
 
+mail:
+  host: imap.qq.com
+  port: 993
+  username: mjd507@qq.com
+  password: ${mail_authorization_code}
+  protocol: imaps
+
 file:
   writing-dir: ${java.io.tmpdir}/random-folder/
   reading-dir: ${java.io.tmpdir}/random-folder/
@@ -41,13 +48,7 @@ sftp:
   port: 22
   user: jiandong
   password: ${sftp_password}
-  meta_data_dir: ${java.io.tmpdir}/Meta_Data
-  remote_dir: ${java.io.tmpdir}/SFTP_Remote
-  local_dir: ${java.io.tmpdir}/SFTP_Local
-
-mail:
-  host: imap.qq.com
-  port: 993
-  username: mjd507@qq.com
-  password: ${mail_authorization_code}
-  protocol: imaps
+  dirs:
+    meta_data_dir: ${java.io.tmpdir}/Meta_Data
+    remote_dir: ${java.io.tmpdir}/SFTP_Remote
+    local_dir: ${java.io.tmpdir}/SFTP_Local
