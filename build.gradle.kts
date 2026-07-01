@@ -36,6 +36,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-activemq")    // boot-activemq
     implementation("org.apache.activemq:activemq-broker")                      // activemq-broker
     implementation("org.springframework.integration:spring-integration-jms")   // jms
+    implementation("io.github.resilience4j:resilience4j-ratelimiter:2.4.0")    // ratelimiter
     testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
     testImplementation("org.springframework.boot:spring-boot-starter-actuator-test")
     testImplementation("org.springframework.integration:spring-integration-test")
