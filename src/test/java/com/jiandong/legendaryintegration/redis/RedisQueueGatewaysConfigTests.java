@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.integration.channel.QueueChannel;
 import org.springframework.integration.config.EnableIntegration;
+import org.springframework.integration.endpoint.AbstractEndpoint;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.MessageHeaders;
@@ -22,6 +23,10 @@ import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 class RedisQueueGatewaysConfigTests implements RedisContainerTest {
 
 	@Autowired
+	@Qualifier("redisInboundGatewayEndpoint")
+	AbstractEndpoint redisInboundGatewayEndpoint;
+
+	@Autowired
 	@Qualifier("queueOutboundGatewayFlow.input")
 	MessageChannel queueOutboundGatewayInput;
 
@@ -33,12 +38,16 @@ class RedisQueueGatewaysConfigTests implements RedisContainerTest {
 				.setHeader(MessageHeaders.REPLY_CHANNEL, replyChannel)
 				.build();
 
+		redisInboundGatewayEndpoint.start();
+
 		queueOutboundGatewayInput.send(gatewayMessage);
 		Message<?> message = replyChannel.receive(10000);
 
 		Assertions.assertThat(message)
 				.extracting(Message::getPayload)
 				.isEqualTo("Acked:" + gatewayMessagePayload);
+
+		redisInboundGatewayEndpoint.stop();
 
 	}
 

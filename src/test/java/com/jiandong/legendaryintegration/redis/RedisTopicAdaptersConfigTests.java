@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.integration.channel.QueueChannel;
 import org.springframework.integration.config.EnableIntegration;
+import org.springframework.integration.endpoint.AbstractEndpoint;
 import org.springframework.integration.support.MessageBuilder;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
@@ -21,6 +22,10 @@ import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 class RedisTopicAdaptersConfigTests implements RedisContainerTest {
 
 	@Autowired
+	@Qualifier("redisSubscribeEndpoint")
+	AbstractEndpoint redisSubscribeEndpoint;
+
+	@Autowired
 	@Qualifier("publishingTopicFlow.input")
 	MessageChannel publishingTopicInput;
 
@@ -29,6 +34,8 @@ class RedisTopicAdaptersConfigTests implements RedisContainerTest {
 
 	@Test
 	void happyFlow() {
+		redisSubscribeEndpoint.start();
+
 		publishingTopicInput.send(MessageBuilder.withPayload("hello").build());
 
 		Message<?> message = topicOutputChannel.receive(10000);
@@ -36,6 +43,8 @@ class RedisTopicAdaptersConfigTests implements RedisContainerTest {
 		Assertions.assertThat(message).isNotNull();
 		Assertions.assertThat(message.getPayload()).isEqualTo("hello");
 		Assertions.assertThat(message.getHeaders()).containsEntry("redis_messageSource", "newsTopic");
+
+		redisSubscribeEndpoint.stop();
 	}
 
 }

@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.integration.channel.QueueChannel;
 import org.springframework.integration.config.EnableIntegration;
+import org.springframework.integration.endpoint.AbstractEndpoint;
 import org.springframework.integration.support.MessageBuilder;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
@@ -21,6 +22,10 @@ import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 class RedisQueueAdaptersConfigTests implements RedisContainerTest {
 
 	@Autowired
+	@Qualifier("redisQueueEndpoint")
+	AbstractEndpoint redisQueueEndpoint;
+
+	@Autowired
 	@Qualifier("pushQueueFlow.input")
 	MessageChannel pushQueueFlowInput;
 
@@ -29,6 +34,8 @@ class RedisQueueAdaptersConfigTests implements RedisContainerTest {
 
 	@Test
 	void happyFlow() {
+		redisQueueEndpoint.start();
+
 		pushQueueFlowInput.send(MessageBuilder.withPayload("1").build());
 		pushQueueFlowInput.send(MessageBuilder.withPayload("2").build());
 		pushQueueFlowInput.send(MessageBuilder.withPayload("3").build());
@@ -41,6 +48,8 @@ class RedisQueueAdaptersConfigTests implements RedisContainerTest {
 
 		Message<?> message3 = queueOutputChannel.receive(10000);
 		Assertions.assertThat(message3).extracting(Message::getPayload).isEqualTo("3");
+
+		redisQueueEndpoint.stop();
 	}
 
 }

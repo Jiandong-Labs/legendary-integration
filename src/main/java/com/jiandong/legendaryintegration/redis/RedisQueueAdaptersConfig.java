@@ -24,6 +24,8 @@ public class RedisQueueAdaptersConfig {
 	public IntegrationFlow popQueueFlow(RedisConnectionFactory connectionFactory) {
 		return IntegrationFlow.from(Redis
 						.queueInboundChannelAdapter("redis-queue", connectionFactory)
+						.id("redisQueueEndpoint")
+						.autoStartup(false)
 						.serializer(RedisSerializer.string())
 						.expectMessage(false)
 						.rightPop(true))

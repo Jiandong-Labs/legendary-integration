@@ -24,6 +24,8 @@ public class RedisQueueGatewaysConfig {
 	IntegrationFlow queueInboundGatewayFlow(RedisConnectionFactory redisConnectionFactory) {
 		return IntegrationFlow.from(Redis
 						.queueInboundGateway("queueGateways", redisConnectionFactory)
+						.id("redisInboundGatewayEndpoint")
+						.autoStartup(false)
 						.serializer(RedisSerializer.string())
 						.receiveTimeout(10000))
 				.handle((uuidValue, headers) -> "Acked:" + uuidValue)

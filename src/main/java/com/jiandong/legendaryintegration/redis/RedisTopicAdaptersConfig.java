@@ -24,6 +24,8 @@ public class RedisTopicAdaptersConfig {
 	public IntegrationFlow subscribeTopicFlow(RedisConnectionFactory redisConnectionFactory) {
 		return IntegrationFlow.from(Redis
 						.inboundChannelAdapter(redisConnectionFactory)
+						.id("redisSubscribeEndpoint")
+						.autoStartup(false)
 						.topics(TOPIC))
 				.log()
 				.channel("topicOutputChannel")
