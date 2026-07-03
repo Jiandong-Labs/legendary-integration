@@ -51,7 +51,9 @@ tasks.withType<Test> {
     testLogging.showStandardStreams = true
 
     useJUnitPlatform()
+}
 
+tasks.check {
     finalizedBy(tasks.jacocoTestReport, tasks.jacocoTestCoverageVerification)
 }
 
