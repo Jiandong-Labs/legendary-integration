@@ -3,7 +3,6 @@ package com.jiandong.legendaryintegration.advice;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.jiandong.legendaryintegration.config.IntegrationErrorConfig;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -18,7 +17,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 @EnableIntegration
-@SpringJUnitConfig({CircuitBreakerFlowConfig.class, IntegrationErrorConfig.class})
+@SpringJUnitConfig({CircuitBreakerFlowConfig.class})
 @DirtiesContext
 class CircuitBreakerFlowConfigTests {
 
