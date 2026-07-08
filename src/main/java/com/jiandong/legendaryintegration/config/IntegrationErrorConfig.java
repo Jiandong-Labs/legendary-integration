@@ -19,7 +19,7 @@ import static com.jiandong.legendaryintegration.util.Constants.ROUTER_VAL_RETRY;
 import static com.jiandong.legendaryintegration.util.Constants.ROUTER_VAL_RETRY_CHANNEL;
 
 @Configuration(proxyBeanMethods = false)
-class IntegrationErrorConfig {
+public class IntegrationErrorConfig {
 
 	private static final Logger log = LoggerFactory.getLogger(IntegrationErrorConfig.class);
 
