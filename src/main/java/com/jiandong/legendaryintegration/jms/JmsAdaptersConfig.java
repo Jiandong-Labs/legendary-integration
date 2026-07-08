@@ -10,12 +10,12 @@ import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.jms.dsl.Jms;
 
 @Configuration
-public class JmsAdaptersConfig {
+class JmsAdaptersConfig {
 
 	private static final JsonMapper JSON_MAPPER = new JsonMapper();
 
 	@Bean
-	public IntegrationFlow jmsOutboundMessageFlow(ConnectionFactory connectionFactory) {
+	IntegrationFlow jmsOutboundMessageFlow(ConnectionFactory connectionFactory) {
 		return flow -> flow
 				.handle(Jms.outboundAdapter(connectionFactory)
 						.extractPayload(true)
@@ -23,7 +23,7 @@ public class JmsAdaptersConfig {
 	}
 
 	@Bean
-	public IntegrationFlow jmsMessageDrivenFlow(ConnectionFactory connectionFactory) {
+	IntegrationFlow jmsMessageDrivenFlow(ConnectionFactory connectionFactory) {
 		return IntegrationFlow.from(Jms.messageDrivenChannelAdapter(connectionFactory)
 						.id("jmsMessageProducer")
 						.autoStartup(false)
@@ -36,11 +36,11 @@ public class JmsAdaptersConfig {
 	}
 
 	@Bean
-	public QueueChannel jmsOutputChannel() {
+	QueueChannel jmsOutputChannel() {
 		return new QueueChannel();
 	}
 
-	public record Point(int x, int y) {
+	record Point(int x, int y) {
 
 	}
 

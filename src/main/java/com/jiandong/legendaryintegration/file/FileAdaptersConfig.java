@@ -15,7 +15,7 @@ import org.springframework.integration.file.FileHeaders;
 import org.springframework.integration.file.dsl.Files;
 
 @Configuration
-public class FileAdaptersConfig {
+class FileAdaptersConfig {
 
 	private static final Logger log = LoggerFactory.getLogger(FileAdaptersConfig.class);
 
@@ -26,7 +26,7 @@ public class FileAdaptersConfig {
 	private String readingDir;
 
 	@Bean
-	public IntegrationFlow fileWritingFlow() {
+	IntegrationFlow fileWritingFlow() {
 		return flow -> flow
 				.enrichHeaders((headers) -> {
 					headers.header(FileHeaders.FILENAME, "foo.txt");
@@ -39,7 +39,7 @@ public class FileAdaptersConfig {
 	}
 
 	@Bean
-	public IntegrationFlow fileReadingFlow() {
+	IntegrationFlow fileReadingFlow() {
 		return IntegrationFlow
 				.from(Files.inboundAdapter(new File(readingDir))
 						.patternFilter("*.txt")
@@ -59,7 +59,7 @@ public class FileAdaptersConfig {
 	}
 
 	@Bean
-	public QueueChannel fileOutputChannel() {
+	QueueChannel fileOutputChannel() {
 		return new QueueChannel();
 	}
 

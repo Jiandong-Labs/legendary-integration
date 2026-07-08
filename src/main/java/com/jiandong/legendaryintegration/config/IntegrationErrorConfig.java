@@ -19,19 +19,19 @@ import static com.jiandong.legendaryintegration.util.Constants.ROUTER_VAL_RETRY;
 import static com.jiandong.legendaryintegration.util.Constants.ROUTER_VAL_RETRY_CHANNEL;
 
 @Configuration(proxyBeanMethods = false)
-public class IntegrationErrorConfig {
+class IntegrationErrorConfig {
 
 	private static final Logger log = LoggerFactory.getLogger(IntegrationErrorConfig.class);
 
 	@Bean(IntegrationContextUtils.ERROR_CHANNEL_BEAN_NAME)
-	public PublishSubscribeChannel errorChannel() {
+	PublishSubscribeChannel errorChannel() {
 		PublishSubscribeChannel errorChannel = new PublishSubscribeChannel(true);
 		errorChannel.setIgnoreFailures(true);
 		return errorChannel;
 	}
 
 	@Bean
-	public IntegrationFlow globalErrorHandlingFlow() {
+	IntegrationFlow globalErrorHandlingFlow() {
 		return IntegrationFlow.from(IntegrationContextUtils.ERROR_CHANNEL_BEAN_NAME)
 				.route(Message.class, msg -> {
 							Object routeKey = msg.getHeaders().get(ROUTER_KEY);

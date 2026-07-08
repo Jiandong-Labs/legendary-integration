@@ -10,10 +10,10 @@ import org.springframework.integration.dsl.Pollers;
 import org.springframework.integration.redis.dsl.Redis;
 
 @Configuration
-public class RedisStoreAdaptersConfig {
+class RedisStoreAdaptersConfig {
 
 	@Bean
-	public IntegrationFlow redisStoreOutboundFlow(RedisConnectionFactory redisConnectionFactory) {
+	IntegrationFlow redisStoreOutboundFlow(RedisConnectionFactory redisConnectionFactory) {
 		return flow -> flow
 				.handle(Redis.storeOutboundChannelAdapter(redisConnectionFactory)
 						.collectionType(RedisCollectionFactoryBean.CollectionType.ZSET)
@@ -22,7 +22,7 @@ public class RedisStoreAdaptersConfig {
 	}
 
 	@Bean
-	public IntegrationFlow redisStoreInboundFlow(RedisConnectionFactory redisConnectionFactory) {
+	IntegrationFlow redisStoreInboundFlow(RedisConnectionFactory redisConnectionFactory) {
 		return IntegrationFlow.from(Redis
 						.storeInboundChannelAdapter(redisConnectionFactory, "tasks-zset-store")
 						.collectionType(RedisCollectionFactoryBean.CollectionType.ZSET), e -> e

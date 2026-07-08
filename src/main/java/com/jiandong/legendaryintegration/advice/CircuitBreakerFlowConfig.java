@@ -9,12 +9,12 @@ import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.handler.advice.RequestHandlerCircuitBreakerAdvice;
 
 @Configuration(proxyBeanMethods = false)
-public class CircuitBreakerFlowConfig {
+class CircuitBreakerFlowConfig {
 
 	private static final Logger log = LoggerFactory.getLogger(CircuitBreakerFlowConfig.class);
 
 	@Bean
-	public RequestHandlerCircuitBreakerAdvice circuitBreakerAdvice() {
+	RequestHandlerCircuitBreakerAdvice circuitBreakerAdvice() {
 		var circuitBreakerAdvice = new RequestHandlerCircuitBreakerAdvice();
 
 		circuitBreakerAdvice.setThreshold(2);
@@ -24,7 +24,7 @@ public class CircuitBreakerFlowConfig {
 	}
 
 	@Bean
-	public IntegrationFlow circuitBreakerFlow(RequestHandlerCircuitBreakerAdvice circuitBreakerAdvice) {
+	IntegrationFlow circuitBreakerFlow(RequestHandlerCircuitBreakerAdvice circuitBreakerAdvice) {
 		return flow -> flow
 				.<String>handle((p, h) -> {
 					log.info("payload: {}", p);

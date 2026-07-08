@@ -8,7 +8,7 @@ import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.redis.dsl.Redis;
 
 @Configuration
-public class RedisQueueGatewaysConfig {
+class RedisQueueGatewaysConfig {
 
 	@Bean
 	IntegrationFlow queueOutboundGatewayFlow(RedisConnectionFactory redisConnectionFactory) {

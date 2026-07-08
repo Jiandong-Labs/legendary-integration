@@ -10,12 +10,12 @@ import org.springframework.integration.handler.advice.IdempotentReceiverIntercep
 import org.springframework.integration.selector.MetadataStoreSelector;
 
 @Configuration(proxyBeanMethods = false)
-public class IdempotentReceiverFlowConfig {
+class IdempotentReceiverFlowConfig {
 
 	private static final Logger log = LoggerFactory.getLogger(IdempotentReceiverFlowConfig.class);
 
 	@Bean
-	public IdempotentReceiverInterceptor idempotentReceiverInterceptor() {
+	IdempotentReceiverInterceptor idempotentReceiverInterceptor() {
 		var messageSelector = new MetadataStoreSelector(m ->
 				(String) m.getHeaders().get("unique_key"));
 		var receiverInterceptor = new IdempotentReceiverInterceptor(messageSelector);
@@ -24,7 +24,7 @@ public class IdempotentReceiverFlowConfig {
 	}
 
 	@Bean
-	public IntegrationFlow idempotentFlow(IdempotentReceiverInterceptor idempotentReceiverInterceptor) {
+	IntegrationFlow idempotentFlow(IdempotentReceiverInterceptor idempotentReceiverInterceptor) {
 		return flow -> flow
 				.<String>handle((p, h) -> {
 					log.info("payload: {}", p);

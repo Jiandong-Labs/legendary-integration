@@ -20,12 +20,12 @@ import static com.jiandong.legendaryintegration.util.Constants.ROUTER_VAL_RATE_L
 import static com.jiandong.legendaryintegration.util.Constants.ROUTER_VAL_RATE_LIMIT_CHANNEL;
 
 @Configuration(proxyBeanMethods = false)
-public class RateLimiterFlowConfig {
+class RateLimiterFlowConfig {
 
 	private static final Logger log = LoggerFactory.getLogger(RateLimiterFlowConfig.class);
 
 	@Bean
-	public RateLimiterRequestHandlerAdvice rateLimiterRequestHandlerAdvice() {
+	RateLimiterRequestHandlerAdvice rateLimiterRequestHandlerAdvice() {
 		return new RateLimiterRequestHandlerAdvice(RateLimiterConfig.custom()
 				.limitRefreshPeriod(Duration.ofSeconds(1))
 				.limitForPeriod(1)
@@ -34,14 +34,14 @@ public class RateLimiterFlowConfig {
 	}
 
 	@Bean
-	public ExpressionEvaluatingRequestHandlerAdvice errorHandlerAdvice() {
+	ExpressionEvaluatingRequestHandlerAdvice errorHandlerAdvice() {
 		var advice = new ExpressionEvaluatingRequestHandlerAdvice();
 		advice.setFailureChannelName(IntegrationContextUtils.ERROR_CHANNEL_BEAN_NAME);
 		return advice;
 	}
 
 	@Bean
-	public IntegrationFlow rateLimitedFlow(RateLimiterRequestHandlerAdvice rateLimiterRequestHandlerAdvice,
+	IntegrationFlow rateLimitedFlow(RateLimiterRequestHandlerAdvice rateLimiterRequestHandlerAdvice,
 			ExpressionEvaluatingRequestHandlerAdvice errorHandlerAdvice) {
 		return flow -> flow
 				.enrichHeaders(h -> h.header(ROUTER_KEY, ROUTER_VAL_RATE_LIMIT))
@@ -55,7 +55,7 @@ public class RateLimiterFlowConfig {
 	}
 
 	@Bean
-	public IntegrationFlow rateLimitedErrorFlow() {
+	IntegrationFlow rateLimitedErrorFlow() {
 		return IntegrationFlow.from(ROUTER_VAL_RATE_LIMIT_CHANNEL)
 				.<MessagingException>handle((p, h) -> {
 					log.error("due to rate limitation, original message is not delivered : {}", p.getFailedMessage(), p.getMostSpecificCause());
@@ -66,7 +66,7 @@ public class RateLimiterFlowConfig {
 	}
 
 	@Bean
-	public QueueChannel rateLimitedErrorOutputChannel() {
+	QueueChannel rateLimitedErrorOutputChannel() {
 		return new QueueChannel();
 	}
 

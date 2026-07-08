@@ -9,17 +9,17 @@ import org.springframework.integration.event.inbound.ApplicationEventListeningMe
 import org.springframework.integration.event.outbound.ApplicationEventPublishingMessageHandler;
 
 @Configuration
-public class EventAdaptersConfig {
+class EventAdaptersConfig {
 
 	@Bean
-	public IntegrationFlow publishEventFlow() {
+	IntegrationFlow publishEventFlow() {
 		var messageHandler = new ApplicationEventPublishingMessageHandler();
 		messageHandler.setPublishPayload(false);
 		return flow -> flow.handle(messageHandler);
 	}
 
 	@Bean
-	public IntegrationFlow subscribeEventFlow() {
+	IntegrationFlow subscribeEventFlow() {
 		var messageProducer = new ApplicationEventListeningMessageProducer();
 		messageProducer.setEventTypes(MessagingEvent.class);
 		return IntegrationFlow.from(messageProducer)
@@ -29,7 +29,7 @@ public class EventAdaptersConfig {
 	}
 
 	@Bean
-	public QueueChannel eventOutputChannel() {
+	QueueChannel eventOutputChannel() {
 		return new QueueChannel();
 	}
 

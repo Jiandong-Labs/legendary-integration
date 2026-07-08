@@ -22,12 +22,12 @@ import static com.jiandong.legendaryintegration.util.Constants.ROUTER_VAL_RETRY;
 import static com.jiandong.legendaryintegration.util.Constants.ROUTER_VAL_RETRY_CHANNEL;
 
 @Configuration(proxyBeanMethods = false)
-public class RetryableFlowConfig {
+class RetryableFlowConfig {
 
 	private static final Logger log = LoggerFactory.getLogger(RetryableFlowConfig.class);
 
 	@Bean
-	public RequestHandlerRetryAdvice retryAdvice(ErrorMessageSendingRecoverer retryRecoveryCallback) {
+	RequestHandlerRetryAdvice retryAdvice(ErrorMessageSendingRecoverer retryRecoveryCallback) {
 		var retryAdvice = new RequestHandlerRetryAdvice();
 
 		retryAdvice.setRetryPolicy(RetryPolicy.builder().maxRetries(1).delay(Duration.ZERO).build());
@@ -46,12 +46,12 @@ public class RetryableFlowConfig {
 	}
 
 	@Bean
-	public ErrorMessageSendingRecoverer retryRecoveryCallback() {
+	ErrorMessageSendingRecoverer retryRecoveryCallback() {
 		return new ErrorMessageSendingRecoverer(); // by default, sending to error channel
 	}
 
 	@Bean
-	public IntegrationFlow retryableFlow(RequestHandlerRetryAdvice retryAdvice) {
+	IntegrationFlow retryableFlow(RequestHandlerRetryAdvice retryAdvice) {
 		return flow -> flow
 				.enrichHeaders(Map.of(ROUTER_KEY, ROUTER_VAL_RETRY))
 				.<String>handle((payload, headers) -> {
@@ -63,7 +63,7 @@ public class RetryableFlowConfig {
 	}
 
 	@Bean
-	public IntegrationFlow retryableErrorFlow() {
+	IntegrationFlow retryableErrorFlow() {
 		return IntegrationFlow.from(ROUTER_VAL_RETRY_CHANNEL)
 				.<MessagingException>handle((p, h) -> {
 					log.error("retry error: {}", p.getFailedMessage(), p.getMostSpecificCause());
@@ -74,7 +74,7 @@ public class RetryableFlowConfig {
 	}
 
 	@Bean
-	public QueueChannel retryErrorOutputChannel() {
+	QueueChannel retryErrorOutputChannel() {
 		return new QueueChannel();
 	}
 

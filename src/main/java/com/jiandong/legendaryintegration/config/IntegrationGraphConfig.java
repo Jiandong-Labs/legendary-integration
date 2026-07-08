@@ -5,6 +5,6 @@ import org.springframework.integration.http.config.EnableIntegrationGraphControl
 
 @Configuration
 @EnableIntegrationGraphController
-public class IntegrationGraphConfig {
+class IntegrationGraphConfig {
 
 }

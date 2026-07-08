@@ -21,7 +21,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 
 @Configuration
 @EnableConfigurationProperties(MailAdaptersConfig.ImapMailProperties.class)
-public class MailAdaptersConfig {
+class MailAdaptersConfig {
 
 	private static final Logger log = LoggerFactory.getLogger(MailAdaptersConfig.class);
 
@@ -29,7 +29,7 @@ public class MailAdaptersConfig {
 	private String username;
 
 	@Bean
-	public IntegrationFlow mailSendFlow(JavaMailSender javaMailSender) {
+	IntegrationFlow mailSendFlow(JavaMailSender javaMailSender) {
 		return flow -> flow
 				.enrichHeaders(Mail.headers()
 						.from(username)
@@ -39,12 +39,12 @@ public class MailAdaptersConfig {
 	}
 
 	@ConfigurationProperties("mail")
-	public record ImapMailProperties(String host, Integer port, String username, String password, String protocol) {
+	record ImapMailProperties(String host, Integer port, String username, String password, String protocol) {
 
 	}
 
 	@Bean
-	public IntegrationFlow mailReceivingFlow(ImapMailProperties mailProperties) {
+	IntegrationFlow mailReceivingFlow(ImapMailProperties mailProperties) {
 		var user = mailProperties.username.replace("@", "%40");
 		var url = "%s://%s:%s@%s:%d/INBOX".formatted(mailProperties.protocol, user, mailProperties.password, mailProperties.host, mailProperties.port);
 		return IntegrationFlow.from(Mail.imapInboundAdapter(url)
@@ -76,7 +76,7 @@ public class MailAdaptersConfig {
 	}
 
 	@Bean
-	public QueueChannel mailOutputChannel() {
+	QueueChannel mailOutputChannel() {
 		return new QueueChannel();
 	}
 

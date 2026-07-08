@@ -8,12 +8,12 @@ import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.redis.dsl.Redis;
 
 @Configuration
-public class RedisTopicAdaptersConfig {
+class RedisTopicAdaptersConfig {
 
 	private static final String TOPIC = "newsTopic";
 
 	@Bean
-	public IntegrationFlow publishingTopicFlow(RedisConnectionFactory redisConnectionFactory) {
+	IntegrationFlow publishingTopicFlow(RedisConnectionFactory redisConnectionFactory) {
 		return flow -> flow
 				.handle(Redis
 						.outboundChannelAdapter(redisConnectionFactory)
@@ -21,7 +21,7 @@ public class RedisTopicAdaptersConfig {
 	}
 
 	@Bean
-	public IntegrationFlow subscribeTopicFlow(RedisConnectionFactory redisConnectionFactory) {
+	IntegrationFlow subscribeTopicFlow(RedisConnectionFactory redisConnectionFactory) {
 		return IntegrationFlow.from(Redis
 						.inboundChannelAdapter(redisConnectionFactory)
 						.id("redisSubscribeEndpoint")
@@ -33,7 +33,7 @@ public class RedisTopicAdaptersConfig {
 	}
 
 	@Bean
-	public QueueChannel topicOutputChannel() {
+	QueueChannel topicOutputChannel() {
 		return new QueueChannel();
 	}
 

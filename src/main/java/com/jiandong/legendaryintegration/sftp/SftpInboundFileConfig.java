@@ -28,22 +28,22 @@ import org.springframework.integration.sftp.session.DefaultSftpSessionFactory;
 
 @Configuration(proxyBeanMethods = false)
 @EnableConfigurationProperties({SftpInboundFileConfig.SftpProperties.class, SftpInboundFileConfig.SftpDirs.class})
-public class SftpInboundFileConfig {
+class SftpInboundFileConfig {
 
 	private static final Logger log = LoggerFactory.getLogger(SftpInboundFileConfig.class);
 
 	@ConfigurationProperties("sftp")
-	public record SftpProperties(String host, Integer port, String user, String password) {
+	record SftpProperties(String host, Integer port, String user, String password) {
 
 	}
 
 	@ConfigurationProperties("sftp.dirs")
-	public record SftpDirs(String metaDataDir, String remoteDir, String localDir) {
+	record SftpDirs(String metaDataDir, String remoteDir, String localDir) {
 
 	}
 
 	@Bean
-	public SessionFactory<SftpClient.DirEntry> sftpSessionFactory(SftpProperties sftpProperties) {
+	SessionFactory<SftpClient.DirEntry> sftpSessionFactory(SftpProperties sftpProperties) {
 		DefaultSftpSessionFactory factory = new DefaultSftpSessionFactory(true);
 		factory.setHost(sftpProperties.host());
 		factory.setPort(sftpProperties.port());
@@ -54,7 +54,7 @@ public class SftpInboundFileConfig {
 	}
 
 	@Bean
-	public ConcurrentMetadataStore remoteFileMetaStore(SftpDirs sftpDirs) {
+	ConcurrentMetadataStore remoteFileMetaStore(SftpDirs sftpDirs) {
 		var metadataStore = new PropertiesPersistingMetadataStore();
 		metadataStore.setBaseDirectory(sftpDirs.metaDataDir);
 		metadataStore.setFileName("sftp_meta_data.properties");
@@ -63,7 +63,7 @@ public class SftpInboundFileConfig {
 	}
 
 	@Bean
-	public CompositeFileListFilter<SftpClient.DirEntry> remoteSftpFileFilter(SftpDirs sftpDirs) {
+	CompositeFileListFilter<SftpClient.DirEntry> remoteSftpFileFilter(SftpDirs sftpDirs) {
 		var remoteFileNameStore = new PropertiesPersistingMetadataStore();
 		remoteFileNameStore.setBaseDirectory(sftpDirs.metaDataDir);
 		remoteFileNameStore.setFileName("sftp_file.properties");
@@ -79,7 +79,7 @@ public class SftpInboundFileConfig {
 	}
 
 	@Bean
-	public CompositeFileListFilter<File> localFileFilter(SftpDirs sftpDirs) {
+	CompositeFileListFilter<File> localFileFilter(SftpDirs sftpDirs) {
 		var localFileNameStore = new PropertiesPersistingMetadataStore();
 		localFileNameStore.setBaseDirectory(sftpDirs.metaDataDir);
 		localFileNameStore.setFileName("local_file.properties");
@@ -95,7 +95,7 @@ public class SftpInboundFileConfig {
 	}
 
 	@Bean
-	public IntegrationFlow sftpInboundFileFlow(SessionFactory<SftpClient.DirEntry> sftpSessionFactory,
+	IntegrationFlow sftpInboundFileFlow(SessionFactory<SftpClient.DirEntry> sftpSessionFactory,
 			SftpDirs sftpDirs, CompositeFileListFilter<SftpClient.DirEntry> remoteSftpFileFilter,
 			CompositeFileListFilter<File> localFileFilter, ConcurrentMetadataStore remoteFileMetaStore) {
 		return IntegrationFlow

@@ -13,17 +13,17 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 
 @Configuration(proxyBeanMethods = false)
-public class TransactionFlowConfig {
+class TransactionFlowConfig {
 
 	private static final Logger log = LoggerFactory.getLogger(TransactionFlowConfig.class);
 
 	@Bean
-	public PseudoTransactionManager transactionManager() {
+	PseudoTransactionManager transactionManager() {
 		return new PseudoTransactionManager();
 	}
 
 	@Bean
-	public IntegrationFlow transactionFlow(PlatformTransactionManager transactionManager) {
+	IntegrationFlow transactionFlow(PlatformTransactionManager transactionManager) {
 		return flow -> flow
 				.handle(msg -> log.info("this is inside a transaction"), e -> e
 						.id("transactionalHandler")

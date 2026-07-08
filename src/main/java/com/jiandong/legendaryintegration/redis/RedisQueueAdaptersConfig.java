@@ -9,10 +9,10 @@ import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.redis.dsl.Redis;
 
 @Configuration
-public class RedisQueueAdaptersConfig {
+class RedisQueueAdaptersConfig {
 
 	@Bean
-	public IntegrationFlow pushQueueFlow(RedisConnectionFactory connectionFactory) {
+	IntegrationFlow pushQueueFlow(RedisConnectionFactory connectionFactory) {
 		return flow -> flow
 				.handle(Redis
 						.queueOutboundChannelAdapter("redis-queue", connectionFactory)
@@ -21,7 +21,7 @@ public class RedisQueueAdaptersConfig {
 	}
 
 	@Bean
-	public IntegrationFlow popQueueFlow(RedisConnectionFactory connectionFactory) {
+	IntegrationFlow popQueueFlow(RedisConnectionFactory connectionFactory) {
 		return IntegrationFlow.from(Redis
 						.queueInboundChannelAdapter("redis-queue", connectionFactory)
 						.id("redisQueueEndpoint")
@@ -35,7 +35,7 @@ public class RedisQueueAdaptersConfig {
 	}
 
 	@Bean
-	public QueueChannel queueOutputChannel() {
+	QueueChannel queueOutputChannel() {
 		return new QueueChannel();
 	}
 

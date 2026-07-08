@@ -16,18 +16,18 @@ import org.springframework.integration.dsl.context.IntegrationFlowContext;
 import org.springframework.messaging.MessageHeaders;
 
 @Configuration
-public class DynamicRuntimeFlowConfig {
+class DynamicRuntimeFlowConfig {
 
 	private static final Logger log = LoggerFactory.getLogger(DynamicRuntimeFlowConfig.class);
 
 	private final IntegrationFlowContext integrationFlowContext;
 
-	public DynamicRuntimeFlowConfig(IntegrationFlowContext integrationFlowContext) {
+	DynamicRuntimeFlowConfig(IntegrationFlowContext integrationFlowContext) {
 		this.integrationFlowContext = integrationFlowContext;
 	}
 
 	@EventListener(ContextRefreshedEvent.class)
-	public void createDynamicFlows() {
+	void createDynamicFlows() {
 		integrationFlowContext.registration(IntegrationFlow
 						.fromSupplier(new AtomicInteger(0)::incrementAndGet, e -> e
 								.poller(Pollers.fixedDelay(10 * 1000)))
@@ -60,7 +60,7 @@ public class DynamicRuntimeFlowConfig {
 	}
 
 	@Bean
-	public QueueChannel sharedOutputChannel() {
+	QueueChannel sharedOutputChannel() {
 		return new QueueChannel();
 	}
 

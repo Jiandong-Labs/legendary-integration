@@ -7,10 +7,10 @@ import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.redis.dsl.Redis;
 
 @Configuration
-public class RedisOutboundCommandGatewayConfig {
+class RedisOutboundCommandGatewayConfig {
 
 	@Bean
-	public IntegrationFlow outboundCommandGatewayFlow(RedisConnectionFactory redisConnectionFactory) {
+	IntegrationFlow outboundCommandGatewayFlow(RedisConnectionFactory redisConnectionFactory) {
 		return flow -> flow
 				.handle(Redis.outboundGateway(redisConnectionFactory)
 						.command("INCR"));
