@@ -14,11 +14,13 @@ import org.springframework.integration.config.EnableIntegration;
 import org.springframework.integration.support.MessageBuilder;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 @EnableIntegration
 @SpringJUnitConfig({ControlBusFlowConfig.class, BusEndpoint.class})
+@DirtiesContext
 class ControlBusFlowConfigTests {
 
 	@Autowired
