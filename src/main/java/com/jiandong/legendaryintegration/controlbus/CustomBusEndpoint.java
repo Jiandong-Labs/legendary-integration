@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @ManagedResource
-class BusEndpoint {
+class CustomBusEndpoint {
 
 	@ManagedOperation
 	public void callInternalFlow() {

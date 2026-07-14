@@ -7,15 +7,17 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.integration.channel.QueueChannel;
 import org.springframework.integration.dsl.IntegrationFlow;
+import org.springframework.integration.http.config.EnableControlBusController;
 import org.springframework.messaging.Message;
 
+@EnableControlBusController
 @Configuration(proxyBeanMethods = false)
 class ControlBusFlowConfig {
 
 	private static final Logger log = LoggerFactory.getLogger(ControlBusFlowConfig.class);
 
 	@Bean
-	IntegrationFlow controlBus() {
+	IntegrationFlow pureControlBusFlow() {
 		return flow -> flow
 				.controlBus()
 				.handle(Message.class, (payload, headers) -> {
