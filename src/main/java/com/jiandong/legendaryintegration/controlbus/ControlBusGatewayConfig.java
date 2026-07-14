@@ -18,7 +18,7 @@ class ControlBusGatewayConfig {
 	IntegrationFlow gatewayControlBusFlow() {
 		return IntegrationFlow.from(ControlBusGateway.class, spec -> spec
 						.beanName("controlBusGateway")
-						.replyTimeout(30_000))
+						.replyTimeout(500))
 				.enrichHeaders(Map.of("source", "gateway"))
 				.controlBus()
 				.handle((p, h) -> h.get("source") + ":" + p)
@@ -27,11 +27,9 @@ class ControlBusGatewayConfig {
 
 	interface ControlBusGateway {
 
-		default @Nullable Object send(String command) {
-			return send(command, null);
-		}
+		@Nullable Object send(String command);
 
-		@Nullable Object send(String command, @Nullable @Header(IntegrationMessageHeaderAccessor.CONTROL_BUS_ARGUMENTS) List<?> args);
+		@Nullable Object send(String command, @Header(IntegrationMessageHeaderAccessor.CONTROL_BUS_ARGUMENTS) List<?> args);
 
 	}
 

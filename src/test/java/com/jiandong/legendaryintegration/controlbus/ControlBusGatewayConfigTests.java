@@ -22,6 +22,9 @@ class ControlBusGatewayConfigTests {
 
 	@Test
 	void gatewayHappyFlow() {
+		Object noResponse = controlBusGateway.send("customBusEndpoint.callInternalFlow");
+		Assertions.assertThat(noResponse).isNull();
+
 		Object response = controlBusGateway.send("customBusEndpoint.callInternalFlow", List.of("abc"));
 		Assertions.assertThat(response).isEqualTo("gateway:abc");
 	}
