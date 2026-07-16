@@ -12,7 +12,7 @@ import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.messaging.handler.annotation.Header;
 
 @Configuration(proxyBeanMethods = false)
-class ControlBusGatewayConfig {
+public class ControlBusGatewayConfig {
 
 	@Bean
 	IntegrationFlow gatewayControlBusFlow() {
@@ -25,13 +25,14 @@ class ControlBusGatewayConfig {
 				.get();
 	}
 
-	interface ControlBusGateway {
+	public interface ControlBusGateway {
 
-		@Nullable Object send(String command);
+		default @Nullable Object send(String command) {
+			return send(command, List.of());
+		}
 
 		@Nullable Object send(String command, @Header(IntegrationMessageHeaderAccessor.CONTROL_BUS_ARGUMENTS) List<?> args);
 
 	}
 
 }
-
