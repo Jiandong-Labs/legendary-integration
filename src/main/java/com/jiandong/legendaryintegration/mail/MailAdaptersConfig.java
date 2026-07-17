@@ -1,11 +1,10 @@
 package com.jiandong.legendaryintegration.mail;
 
-import java.io.IOException;
 import java.util.Objects;
 
-import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
-import org.apache.commons.mail2.jakarta.util.MimeMessageParser;
+import org.simplejavamail.api.email.Email;
+import org.simplejavamail.converter.EmailConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,18 +57,11 @@ class MailAdaptersConfig {
 								.poller(p -> p.fixedDelay(120 * 1000))
 				)
 				.<MimeMessage>handle((payload, headers) -> {
-					MimeMessageParser parser;
-					try {
-						parser = new MimeMessageParser(payload);
-						parser.parse();
-						log.info("subject:{}, from:{}, to:{}, receive date:{}, text content:{}, html content:{} attachment:{}",
-								parser.getSubject(), parser.getFrom(), parser.getTo(), payload.getReceivedDate(),
-								parser.getPlainContent(), parser.getHtmlContent(), parser.getAttachmentList());
-					}
-					catch (MessagingException | IOException e) {
-						throw new RuntimeException(e);
-					}
-					return parser;
+					Email email = EmailConverter.mimeMessageToEmail(payload);
+					log.info("subject:{}, from:{}, to:{}, receive date:{}, text content:{}, html content:{} attachment:{}",
+							email.getSubject(), email.getFromRecipient(), email.getToRecipients(), email.getSentDate(),
+							email.getPlainText(), email.getHTMLText(), email.getAttachments());
+					return email;
 				})
 				.channel("mailOutputChannel")
 				.get();

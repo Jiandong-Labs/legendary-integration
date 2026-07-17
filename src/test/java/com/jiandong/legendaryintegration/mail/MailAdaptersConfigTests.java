@@ -8,11 +8,11 @@ import com.icegreen.greenmail.util.ServerSetupTest;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
-import org.apache.commons.mail2.jakarta.util.MimeMessageParser;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.simplejavamail.api.email.Email;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -112,16 +112,11 @@ class MailAdaptersConfigTests {
 		Message<?> mailMessage = mailOutputChannel.receive(10000);
 		Assertions.assertThat(mailMessage)
 				.extracting(Message::getPayload)
-				.isInstanceOfSatisfying(MimeMessageParser.class, mimeMessageParser -> {
-					try {
-						assertThat(mimeMessageParser.getFrom()).isEqualTo(sender);
-						assertThat(mimeMessageParser.getTo()).containsOnly(new InternetAddress(receiver));
-						assertThat(mimeMessageParser.getSubject()).isEqualTo("hello xyz");
-						assertThat(mimeMessageParser.getPlainContent()).isEqualTo("this is a test email message.");
-					}
-					catch (MessagingException e) {
-						throw new RuntimeException(e);
-					}
+				.isInstanceOfSatisfying(Email.class, email -> {
+					assertThat(email.getFromRecipient().getAddress()).isEqualTo(sender);
+					assertThat(email.getToRecipients().get(0).getAddress()).isEqualTo(receiver);
+					assertThat(email.getSubject()).isEqualTo("hello xyz");
+					assertThat(email.getPlainText()).isEqualTo("this is a test email message.");
 				});
 
 		imapMailPollingAdapter.stop();
