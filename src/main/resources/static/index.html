@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spring Integration Control Panel</title>
+    <!-- Bootstrap CSS CDN -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #f8f9fa; font-family: system-ui, sans-serif; font-size: 14px; }
+        .master-wrapper { display: flex; flex-direction: column; height: 100vh; padding: 15px; box-sizing: border-box; }
+        .top-deck { flex: 1; min-height: 0; overflow-y: auto; background: #ffffff; padding: 15px; border-radius: 6px; border: 1px solid #dee2e6; }
+        .bottom-deck { height: 280px; margin-top: 15px; background: #1e1e1e; border-radius: 6px; padding: 12px; display: flex; flex-direction: column; }
+        .nav-pills .nav-link { border-radius: 6px; font-weight: 600; padding: 6px 16px; color: #495057; font-size: 13px; }
+        .nav-pills .nav-link.active { background-color: #212529; color: #ffffff; }
+        .terminal { flex: 1; color: #a6e22e; font-family: monospace; font-size: 12px; overflow-y: auto; white-space: pre-wrap; margin-top: 5px; }
+        .arg-input { width: 120px !important; display: inline-block; height: 26px; font-size: 12px; padding: 2px 6px; }
+        .accordion-button:not(.collapsed) { background-color: #f1f3f5; color: #212529; box-shadow: none; }
+        .accordion-button { font-family: monospace; font-weight: 700; padding: 10px 15px; font-size: 13px; }
+        .accordion-button:focus { box-shadow: none; border-color: rgba(0,0,0,.125); }
+        .cmd-item { border-bottom: 1px solid #f1f3f5; padding: 12px 15px; }
+        .cmd-item:last-child { border-bottom: none; }
+    </style>
+</head>
+<body>
+
+<div class="master-wrapper">
+
+    <!-- TOP DECK: OPERATIONAL CONTROL MODULES (TAB CONTROLLED) -->
+    <div class="top-deck">
+        <header class="d-flex justify-content-between align-items-center pb-2 mb-3 border-bottom">
+            <ul class="nav nav-pills" id="panelTabs" role="tablist">
+                <li class="nav-item">
+                    <button class="nav-link active" id="cb-tab" data-bs-toggle="pill" data-bs-target="#cb-pane" type="button" role="tab">Control Bus</button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link" id="gw-tab" data-bs-toggle="pill" data-bs-target="#gw-pane" type="button" role="tab">Gateway</button>
+                </li>
+            </ul>
+        </header>
+
+        <div class="tab-content" id="panelTabsContent">
+
+            <!-- TAB 1: CONTROL BUS (COLLAPSED BY BEAN NAME) -->
+            <div class="tab-pane fade show active" id="cb-pane" role="tabpanel">
+                <div class="d-flex gap-2 mb-3">
+                    <input type="text" id="cbSearch" class="form-control form-control-sm" placeholder="Search beans by profile identity..." onkeyup="filterAccordionBeans()">
+                    <button class="btn btn-sm btn-dark px-3 text-nowrap" onclick="syncControlBusInventory()">Refresh</button>
+                </div>
+
+                <!-- Accordion grouping target structure mapping -->
+                <div class="accordion" id="beanAccordion">
+                    <div class="text-center text-muted py-5">Connecting to system inventory context...</div>
+                </div>
+            </div>
+
+            <!-- TAB 2: EXPLICIT GATEWAY ENDPOINT WRAPPER -->
+            <div class="tab-pane fade" id="gw-pane" role="tabpanel">
+                <div class="row">
+                    <div class="col-md-5">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold text-secondary text-uppercase small" style="font-size:11px;">Request Command:</label>
+                            <input type="text" id="gwCmd" class="form-control form-control-sm" placeholder="e.g., endpoint.start, endpoint.stop" value="endpoint.start">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold text-secondary text-uppercase small" style="font-size:11px;">Request Parameter (JSON Array):</label>
+                            <textarea id="gwArgs" class="form-control form-control-sm text-monospace" rows="6" placeholder='[
+  true
+]'></textarea>
+                        </div>
+                        <button class="btn btn-sm btn-dark w-100 fw-bold" onclick="transmitGatewayRequest()">Call Gateway</button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- BOTTOM DECK: SHARED MONITORING AND WIRE LOG TRACE RUNTIME -->
+    <div class="bottom-deck">
+        <div class="d-flex justify-content-between align-items-center border-bottom pb-1 border-secondary">
+            <span class="fw-bold text-uppercase text-muted" style="font-size: 11px; color: white">Output Panel</span>
+            <button class="btn btn-link btn-sm text-decoration-none text-secondary p-0 m-0" onclick="clearSharedLog()" style="font-size: 11px;">Clear Log</button>
+        </div>
+        <div id="sharedLog" class="terminal">Select operations to execute ...</div>
+    </div>
+
+</div>
+
+<!-- Bootstrap JS Engine for Tab toggles and Accordion state management handlers -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+<script>
+    const TARGET_HOST = 'http://localhost:8080';
+
+    window.addEventListener('DOMContentLoaded', syncControlBusInventory);
+
+    // 1. Control Bus Inventory Catalog Hydrator Subroutine
+    async function syncControlBusInventory() {
+        const acc = document.getElementById('beanAccordion');
+        acc.innerHTML = '<div class="text-center text-muted py-4"><span class="spinner-border spinner-border-sm me-2"></span>Inspecting application context mappings...</div>';
+
+        try {
+            const res = await fetch(`${TARGET_HOST}/control-bus`);
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            const beansList = await res.json(); // Consumes List<ControlBusBean>
+            renderAccordionLayout(beansList);
+        } catch (err) {
+            acc.innerHTML = `<div class="alert alert-danger py-2 small">Failed to establish active connectivity grid: ${err.message}</div>`;
+        }
+    }
+
+    function renderAccordionLayout(beans) {
+        const acc = document.getElementById('beanAccordion');
+        acc.innerHTML = '';
+
+        if (!beans || beans.length === 0) {
+            acc.innerHTML = '<div class="text-center text-muted py-4">No active ControlBusBean configurations exposed.</div>';
+            return;
+        }
+
+        beans.forEach((bean, bIdx) => {
+            const accordionItem = document.createElement('div');
+            accordionItem.className = 'accordion-item bean-accordion-row';
+            accordionItem.setAttribute('data-bean-name', bean.beanName.toLowerCase());
+
+            const collapseId = `collapse_${bIdx}`;
+            const headerId = `heading_${bIdx}`;
+
+            let rowsHtml = '';
+            bean.commands.forEach((cmd) => {
+                rowsHtml += `
+                    <div class="cmd-item d-flex flex-wrap justify-content-between align-items-center gap-2">
+                        <div class="d-flex align-items-center gap-2 flex-wrap">
+                            <code class="text-primary font-weight-bold fs-6">${cmd.command}()</code>
+                            <span class="text-muted small border-start ps-2 d-none d-md-inline" style="font-size:11px;">${cmd.description || 'No guide documentation matching.'}</span>
+                            ${renderSignatureTypeInputs(cmd.parameterTypes)}
+                        </div>
+                        <button class="btn btn-sm btn-outline-dark px-3 py-0" style="font-size:11px; height:24px;"
+                                onclick="dispatchControlBusTarget(this, '${bean.beanName}', '${cmd.command}')">
+                            Execute
+                        </button>
+                    </div>
+                `;
+            });
+
+            accordionItem.innerHTML = `
+                <h2 class="accordion-header" id="${headerId}">
+                    <button class="accordion-button collapsed text-monospace" type="button" data-bs-toggle="collapse" data-bs-target="#${collapseId}">
+                        📦 ${bean.beanName}
+                    </button>
+                </h2>
+                <div id="${collapseId}" class="accordion-collapse collapse" data-bs-parent="#beanAccordion">
+                    <div class="accordion-body p-0 bg-white">
+                        ${rowsHtml}
+                    </div>
+                </div>
+            `;
+            acc.appendChild(accordionItem);
+        });
+    }
+
+    function renderSignatureTypeInputs(types) {
+        if (!types || types.length === 0) return '';
+        let htmlInputs = ' ';
+        types.forEach((typeStr) => {
+            const cleanShortLabel = typeStr.substring(typeStr.lastIndexOf('.') + 1);
+            const nativeFieldType = (cleanShortLabel.toLowerCase().includes('int') || cleanShortLabel.toLowerCase().includes('long')) ? 'number' : 'text';
+            htmlInputs += `<input type="${nativeFieldType}" class="form-control arg-input command-param" data-type="${typeStr}" placeholder="${cleanShortLabel}"> `;
+        });
+        return htmlInputs;
+    }
+
+    // 2. Network Transmit Infrastructure Commands Controllers Hooks
+    async function dispatchControlBusTarget(buttonEl, beanName, command) {
+        const rowContainer = buttonEl.closest('.cmd-item');
+        const inputElements = rowContainer.querySelectorAll('.command-param');
+
+        // Formulate standard request sequential arguments matching List<CommandArgument> constraints
+        let parametersPayloadList = [];
+
+        inputElements.forEach((inputField) => {
+            let val = inputField.value.trim();
+            let expectedClassType = inputField.getAttribute('data-type');
+
+            if (val === '') {
+                parametersPayloadList.push({ value: null, parameterType: expectedClassType });
+            } else {
+                parametersPayloadList.push({ value: val, parameterType: expectedClassType });
+            }
+        });
+
+        // Use encodeURIComponent to safeguard command strings with dots or hashes
+        await runSharedNetworkTransaction(`${TARGET_HOST}/control-bus/${encodeURIComponent(command)}`, parametersPayloadList, "Control Bus");
+    }
+
+    async function transmitGatewayRequest() {
+        const cmdRouteParam = document.getElementById('gwCmd').value.trim();
+        const rawJsonStringPayload = document.getElementById('gwArgs').value.trim();
+
+        if (!cmdRouteParam) return alert('Gateway execution parameter {command} cannot be empty.');
+
+        let parsedBodyMatrix = [];
+        if (rawJsonStringPayload) {
+            try { parsedBodyMatrix = JSON.parse(rawJsonStringPayload); }
+            catch (jsonErr) { return alert('Syntax constraint mapping execution failed: Invalid JSON Array formatting layout.'); }
+        }
+
+        // Use encodeURIComponent to safeguard gateway command parameters
+        await runSharedNetworkTransaction(`${TARGET_HOST}/gateway/control-bus/${encodeURIComponent(cmdRouteParam)}`, parsedBodyMatrix, "Gateway");
+    }
+
+    // 3. Central Wire Pipeline Execution Engine
+    async function runSharedNetworkTransaction(url, body, profileContextTag) {
+        const terminalLog = document.getElementById('sharedLog');
+        const clockTimestamp = new Date().toLocaleTimeString();
+
+        terminalLog.innerHTML += `
+
+[${clockTimestamp}] -> OUTBOUND POST [${profileContextTag}]
+Address: ${url}
+Payload: ${JSON.stringify(body)}`;
+        terminalLog.scrollTop = terminalLog.scrollHeight;
+
+        try {
+            const connectionResult = await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(body)
+            });
+
+            let textDumpData = await connectionResult.text();
+            if (!textDumpData && connectionResult.ok) textDumpData = "[Transaction Finished Successfully: Void Return Frame Object]";
+
+            const layoutColor = connectionResult.ok ? '#a6e22e' : '#f92672';
+            terminalLog.innerHTML += `
+<span style="color: ${layoutColor}">[${clockTimestamp}] <- INBOUND HTTP RESPONSE (${connectionResult.status}):
+${textDumpData}</span>`;
+        } catch (networkException) {
+            terminalLog.innerHTML += `
+<span style="color: #f92672">[${clockTimestamp}] x PIPELINE EXECUTION CRITICAL ERROR:
+${networkException.message}</span>`;
+        }
+        terminalLog.scrollTop = terminalLog.scrollHeight;
+    }
+
+    function filterAccordionBeans() {
+        const queryFilter = document.getElementById('cbSearch').value.toLowerCase();
+        const targetAccordionRows = document.getElementsByClassName('bean-accordion-row');
+        for (let row of targetAccordionRows) {
+            const itemMatchContext = row.getAttribute('data-bean-name');
+            row.style.display = itemMatchContext.includes(queryFilter) ? '' : 'none';
+        }
+    }
+
+    function clearSharedLog() { document.getElementById('sharedLog').innerHTML = '[System Monitor] Console traces flushed.'; }
+</script>
+</body>
+</html>
