@@ -42,7 +42,7 @@ dependencies {
     testImplementation("org.springframework.integration:spring-integration-test")
     testImplementation("org.testcontainers:testcontainers-activemq")
     testImplementation("org.testcontainers:testcontainers-junit-jupiter")
-    testImplementation("com.icegreen:greenmail:2.1.10")
+    testImplementation("com.icegreen:greenmail:2.1.11")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
