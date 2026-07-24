@@ -18,7 +18,7 @@ class TransactionFlowConfig {
 	private static final Logger log = LoggerFactory.getLogger(TransactionFlowConfig.class);
 
 	@Bean
-	PseudoTransactionManager transactionManager() {
+	PseudoTransactionManager pseudoTransactionManager() {
 		return new PseudoTransactionManager();
 	}
 
