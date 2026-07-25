@@ -31,6 +31,10 @@ spring:
     broker-url: vm://localhost?broker.persistent=false
   integration:
     annotations.enable: false
+  datasource:
+    url: ${postgres_url}/legendary_integration
+    username: ${postgres_user}
+    password:  ${postgres_pwd}
 
 mail:
   host: imap.qq.com

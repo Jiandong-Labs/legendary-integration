@@ -37,11 +37,15 @@ dependencies {
     implementation("org.apache.activemq:activemq-broker")                      // activemq-broker
     implementation("org.springframework.integration:spring-integration-jms")   // jms
     implementation("io.github.resilience4j:resilience4j-ratelimiter:2.4.0")    // ratelimiter
+    implementation("org.springframework.integration:spring-integration-jdbc")  // jdbc
+    implementation("org.springframework.boot:spring-boot-starter-jdbc")        // boot-jdbc
+    implementation("org.postgresql:postgresql")                                // postgres-driver
     testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
     testImplementation("org.springframework.boot:spring-boot-starter-actuator-test")
     testImplementation("org.springframework.integration:spring-integration-test")
     testImplementation("org.testcontainers:testcontainers-activemq")
     testImplementation("org.testcontainers:testcontainers-junit-jupiter")
+    testImplementation("org.testcontainers:testcontainers-postgresql")
     testImplementation("com.icegreen:greenmail:2.1.11")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
