@@ -36,19 +36,19 @@ class JdbcAdaptersConfigTests implements PostgresContainerTest {
 
 	@Test
 	void happyFlow() {
-		JdbcAdaptersConfig.Payment payment = new JdbcAdaptersConfig.Payment();
-		payment.setPmtNo("123");
-		payment.setPmtAmt(BigDecimal.TEN);
-		payment.setCurrency("CNY");
+		JdbcAdaptersConfig.Payment payment = new JdbcAdaptersConfig.Payment(null, "123", BigDecimal.TEN, "CNY", null, null);
 		jdbcInputChannel.send(MessageBuilder.withPayload(payment).build());
 
 		paymentPoller.start();
 		Message<?> message = jdbcOutputChannel.receive(10000);
 		Assertions.assertThat(message).extracting(Message::getPayload)
 				.isInstanceOfSatisfying(JdbcAdaptersConfig.Payment.class, pmt -> {
-					Assertions.assertThat(pmt.getPmtNo()).isEqualTo(payment.getPmtNo());
-					Assertions.assertThat(pmt.getPmtAmt()).isEqualByComparingTo(payment.getPmtAmt());
-					Assertions.assertThat(pmt.getCurrency()).isEqualTo(payment.getCurrency());
+					Assertions.assertThat(pmt.pmtNo()).isEqualTo(payment.pmtNo());
+					Assertions.assertThat(pmt.pmtAmt()).isEqualByComparingTo(payment.pmtAmt());
+					Assertions.assertThat(pmt.currency()).isEqualTo(payment.currency());
+					Assertions.assertThat(pmt.id()).isNotNull();
+					Assertions.assertThat(pmt.createdAt()).isNotNull();
+					Assertions.assertThat(pmt.updatedAt()).isNotNull();
 				});
 
 		paymentPoller.stop();
