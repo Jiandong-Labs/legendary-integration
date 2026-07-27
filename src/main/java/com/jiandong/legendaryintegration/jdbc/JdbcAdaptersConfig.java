@@ -31,7 +31,7 @@ class JdbcAdaptersConfig {
 		return IntegrationFlow.from(Jdbc.inboundAdapter(dataSource, "SELECT * FROM PAYMENTS")
 						.rowMapper(new DataClassRowMapper<>(Payment.class)), e -> e
 						.id("paymentPoller")
-						.autoStartup(true)
+						.autoStartup(false)
 						.poller(Pollers
 								.fixedDelay(10000)
 								.transactional()))
