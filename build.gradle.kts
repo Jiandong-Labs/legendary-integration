@@ -28,7 +28,7 @@ dependencies {
     implementation("org.springframework.integration:spring-integration-sftp")  // sftp
     implementation("org.springframework.boot:spring-boot-starter-mail")        // boot-mail
     implementation("org.springframework.integration:spring-integration-mail")  // mail
-    implementation("org.simplejavamail:simple-java-mail:9.1.0")                // use mail-parser only
+    implementation("org.simplejavamail:simple-java-mail:9.2.0")                // use mail-parser only
     implementation("org.springframework.boot:spring-boot-starter-data-redis")  // boot-redis
     implementation("org.springframework.integration:spring-integration-redis") // redis
     implementation("org.springframework.integration:spring-integration-http")  // http
