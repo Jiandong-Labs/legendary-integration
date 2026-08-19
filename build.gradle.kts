@@ -46,7 +46,7 @@ dependencies {
     testImplementation("org.testcontainers:testcontainers-activemq")
     testImplementation("org.testcontainers:testcontainers-junit-jupiter")
     testImplementation("org.testcontainers:testcontainers-postgresql")
-    testImplementation("com.icegreen:greenmail:2.1.11")
+    testImplementation("com.icegreen:greenmail:2.1.12")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
