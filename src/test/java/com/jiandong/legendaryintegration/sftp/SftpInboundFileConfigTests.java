@@ -77,7 +77,7 @@ class SftpInboundFileConfigTests extends SftpTestSupport {
 		Consumer<File> fileConsumer = (downloadedFile) -> {
 			try {
 				assertThat(downloadedFile.getName()).isEqualTo("test.txt");
-				assertThat(downloadedFile.getParentFile()).isEqualTo(localDownloadDir.toFile());
+				assertThat(downloadedFile.getParentFile().getCanonicalPath()).isEqualTo(localDownloadDir.toFile().getCanonicalPath());
 				assertThat(Files.readString(downloadedFile.toPath())).isEqualTo("this is a test file from sftp");
 			}
 			catch (IOException e) {

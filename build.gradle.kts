@@ -1,6 +1,6 @@
 plugins {
     java
-    id("org.springframework.boot") version "4.1.0"
+    id("org.springframework.boot") version "4.2.0-M1"
     id("io.spring.dependency-management") version "1.1.7"
     jacoco
 }

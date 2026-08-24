@@ -10,7 +10,6 @@ import org.springframework.integration.context.IntegrationContextUtils;
 import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessagingException;
-import org.springframework.messaging.support.ErrorMessage;
 
 import static com.jiandong.legendaryintegration.util.Constants.ROUTER_KEY;
 import static com.jiandong.legendaryintegration.util.Constants.ROUTER_VAL_RATE_LIMIT;
@@ -33,18 +32,12 @@ public class IntegrationErrorConfig {
 	@Bean
 	IntegrationFlow globalErrorHandlingFlow() {
 		return IntegrationFlow.from(IntegrationContextUtils.ERROR_CHANNEL_BEAN_NAME)
-				.route(Message.class, msg -> {
-							Object routeKey = msg.getHeaders().get(ROUTER_KEY);
-							if (routeKey == null && msg instanceof ErrorMessage errMsg && errMsg.getOriginalMessage() != null) {
-								return errMsg.getOriginalMessage().getHeaders().get(ROUTER_KEY);
-							}
-							return routeKey;
-						}, e -> e
-								.id("headerValueRouter")
-								.resolutionRequired(false)
-								.channelMapping(ROUTER_VAL_RATE_LIMIT, ROUTER_VAL_RATE_LIMIT_CHANNEL)
-								.channelMapping(ROUTER_VAL_RETRY, ROUTER_VAL_RETRY_CHANNEL)
-								.defaultOutputToParentFlow()
+				.route(Message.class, msg -> msg.getHeaders().get(ROUTER_KEY), e -> e
+						.id("headerValueRouter")
+						.resolutionRequired(false)
+						.channelMapping(ROUTER_VAL_RATE_LIMIT, ROUTER_VAL_RATE_LIMIT_CHANNEL)
+						.channelMapping(ROUTER_VAL_RETRY, ROUTER_VAL_RETRY_CHANNEL)
+						.defaultOutputToParentFlow()
 				)
 				.<MessagingException>handle((p, h) -> {
 					log.info("Unexpected Exception: {}", p.getMessage(), p);
