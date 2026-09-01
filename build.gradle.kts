@@ -40,6 +40,7 @@ dependencies {
     implementation("org.springframework.integration:spring-integration-jdbc")  // jdbc
     implementation("org.springframework.boot:spring-boot-starter-jdbc")        // boot-jdbc
     implementation("org.postgresql:postgresql")                                // postgres-driver
+    implementation("org.springframework.integration:spring-integration-zip")   // zip
     testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
     testImplementation("org.springframework.boot:spring-boot-starter-actuator-test")
     testImplementation("org.springframework.integration:spring-integration-test")
