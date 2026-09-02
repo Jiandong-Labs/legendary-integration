@@ -3,6 +3,7 @@ package com.jiandong.legendaryintegration.redis;
 import java.util.Map;
 import java.util.Set;
 
+import com.jiandong.legendaryintegration.IntegrationTest;
 import com.jiandong.legendaryintegration.config.RedisConfig;
 import com.jiandong.legendaryintegration.testcontainer.RedisContainerTest;
 import org.assertj.core.api.Assertions;
@@ -12,17 +13,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.support.collections.RedisZSet;
 import org.springframework.integration.channel.QueueChannel;
-import org.springframework.integration.config.EnableIntegration;
 import org.springframework.integration.endpoint.SourcePollingChannelAdapter;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.support.MessageBuilder;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
-@EnableIntegration
-@SpringJUnitConfig({RedisStoreAdaptersConfig.class, RedisConfig.class})
-@DirtiesContext
+@IntegrationTest({RedisStoreAdaptersConfig.class, RedisConfig.class})
 class RedisStoreAdaptersConfigTests implements RedisContainerTest {
 
 	@Autowired

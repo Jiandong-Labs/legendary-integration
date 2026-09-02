@@ -2,23 +2,19 @@ package com.jiandong.legendaryintegration.file;
 
 import java.io.File;
 
+import com.jiandong.legendaryintegration.IntegrationBootTest;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.integration.channel.QueueChannel;
-import org.springframework.integration.config.EnableIntegration;
 import org.springframework.integration.endpoint.SourcePollingChannelAdapter;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.support.MessageBuilder;
-import org.springframework.test.annotation.DirtiesContext;
 
-@EnableIntegration
-@SpringBootTest(classes = {FileAdaptersConfig.class}) // using @SpringBootTest for autoloading required yml properties
-@DirtiesContext
+@IntegrationBootTest(classes = {FileAdaptersConfig.class})
 class FileAdaptersConfigTests {
 
 	@Autowired

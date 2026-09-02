@@ -2,6 +2,7 @@ package com.jiandong.legendaryintegration.controlbus;
 
 import java.util.List;
 
+import com.jiandong.legendaryintegration.IntegrationBootTest;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -9,25 +10,20 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.autoconfigure.WebMvcAutoConfiguration;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.http.HttpStatus;
 import org.springframework.integration.IntegrationMessageHeaderAccessor;
 import org.springframework.integration.channel.QueueChannel;
-import org.springframework.integration.config.EnableIntegration;
 import org.springframework.integration.support.MessageBuilder;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.test.web.servlet.assertj.MockMvcTester;
 
-@EnableIntegration
-@SpringBootTest(classes = {ControlBusFlowConfig.class, CustomBusEndpoint.class})
+@IntegrationBootTest(classes = {ControlBusFlowConfig.class, CustomBusEndpoint.class})
 @ImportAutoConfiguration({WebMvcAutoConfiguration.class})
 @AutoConfigureMockMvc
-@DirtiesContext
 class ControlBusFlowTests {
 
 	@Autowired

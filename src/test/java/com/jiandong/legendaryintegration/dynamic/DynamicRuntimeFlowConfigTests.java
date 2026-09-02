@@ -1,19 +1,15 @@
 package com.jiandong.legendaryintegration.dynamic;
 
+import com.jiandong.legendaryintegration.IntegrationTest;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.integration.channel.QueueChannel;
-import org.springframework.integration.config.EnableIntegration;
 import org.springframework.integration.dsl.context.IntegrationFlowContext;
 import org.springframework.messaging.Message;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
-@EnableIntegration
-@SpringJUnitConfig(DynamicRuntimeFlowConfig.class)
-@DirtiesContext
+@IntegrationTest(DynamicRuntimeFlowConfig.class)
 class DynamicRuntimeFlowConfigTests {
 
 	@Autowired

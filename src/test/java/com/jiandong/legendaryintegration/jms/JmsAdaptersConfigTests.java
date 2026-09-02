@@ -1,5 +1,6 @@
 package com.jiandong.legendaryintegration.jms;
 
+import com.jiandong.legendaryintegration.IntegrationTest;
 import com.jiandong.legendaryintegration.config.ActivemqConfig;
 import com.jiandong.legendaryintegration.testcontainer.ActivemqContainerTest;
 import org.assertj.core.api.Assertions;
@@ -9,17 +10,12 @@ import tools.jackson.databind.json.JsonMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.integration.channel.QueueChannel;
-import org.springframework.integration.config.EnableIntegration;
 import org.springframework.integration.endpoint.AbstractEndpoint;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.support.MessageBuilder;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
-@EnableIntegration
-@SpringJUnitConfig({JmsAdaptersConfig.class, ActivemqConfig.class})
-@DirtiesContext
+@IntegrationTest({JmsAdaptersConfig.class, ActivemqConfig.class})
 class JmsAdaptersConfigTests implements ActivemqContainerTest {
 
 	static final JsonMapper JSON_MAPPER = new JsonMapper();

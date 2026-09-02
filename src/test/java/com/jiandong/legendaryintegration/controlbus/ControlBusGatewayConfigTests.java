@@ -2,18 +2,14 @@ package com.jiandong.legendaryintegration.controlbus;
 
 import java.util.List;
 
+import com.jiandong.legendaryintegration.IntegrationTest;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.integration.config.EnableIntegration;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
-@EnableIntegration
-@SpringJUnitConfig({ControlBusGatewayConfig.class, CustomBusEndpoint.class})
-@DirtiesContext
+@IntegrationTest({ControlBusGatewayConfig.class, CustomBusEndpoint.class})
 class ControlBusGatewayConfigTests {
 
 	@Autowired

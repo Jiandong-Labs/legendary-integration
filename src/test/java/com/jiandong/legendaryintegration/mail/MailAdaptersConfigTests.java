@@ -5,6 +5,7 @@ import java.util.Properties;
 
 import com.icegreen.greenmail.util.GreenMail;
 import com.icegreen.greenmail.util.ServerSetupTest;
+import com.jiandong.legendaryintegration.IntegrationBootTest;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
@@ -19,23 +20,18 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.mail.autoconfigure.MailProperties;
 import org.springframework.boot.mail.autoconfigure.MailSenderAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.integration.channel.QueueChannel;
-import org.springframework.integration.config.EnableIntegration;
 import org.springframework.integration.endpoint.SourcePollingChannelAdapter;
 import org.springframework.integration.support.MessageBuilder;
 import org.springframework.integration.test.util.TestUtils;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.MessageHandler;
-import org.springframework.test.annotation.DirtiesContext;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@EnableIntegration
-@SpringBootTest(classes = {MailAdaptersConfig.class})
+@IntegrationBootTest(classes = {MailAdaptersConfig.class})
 @ImportAutoConfiguration({MailSenderAutoConfiguration.class})
-@DirtiesContext
 class MailAdaptersConfigTests {
 
 	GreenMail mailServer;
