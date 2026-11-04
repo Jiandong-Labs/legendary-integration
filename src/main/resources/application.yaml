@@ -58,3 +58,7 @@ sftp:
     meta_data_dir: ${java.io.tmpdir}/Meta_Data
     remote_dir: ${java.io.tmpdir}/SFTP_Remote
     local_dir: ${java.io.tmpdir}/SFTP_Local
+
+mqtt:
+  host: localhost
+  port: 1883

@@ -30,3 +30,7 @@ sftp:
     meta_data_dir: will-be-overrided
     remote_dir: will-be-overrided
     local_dir: will-be-overrided
+
+mqtt:
+  host: dummy-host
+  port: 1883
